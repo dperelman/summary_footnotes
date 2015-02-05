@@ -20,16 +20,17 @@ def summary_footnotes(instance):
     if type(instance) == Article:
         summary = BeautifulSoup(instance.summary)
         footnote_links = summary.findAll('a', {'rel':'footnote'})
-        for link in footnote_links:
-            if mode == 'remove':
-                link.extract()
-            elif mode == 'link':
-                link['href'] = "%s/%s%s" % (instance.settings["SITEURL"],
-                                            instance.url,
-                                            link['href'])
-            else:
-                raise Exception("Unknown summary footnote mode: %s" % mode)
-        instance._summary = text_type(summary)
+        if footnote_links:
+            for link in footnote_links:
+                if mode == 'remove':
+                    link.extract()
+                elif mode == 'link':
+                    link['href'] = "%s/%s%s" % (instance.settings["SITEURL"],
+                                                instance.url,
+                                                link['href'])
+                else:
+                    raise Exception("Unknown summary footnote mode: %s" % mode)
+            instance._summary = text_type(summary)
 
 def register():
     signals.content_object_init.connect(summary_footnotes)

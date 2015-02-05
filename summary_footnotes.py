@@ -4,6 +4,7 @@ Summary Footnotes
 
 Fix handling of footnote links inside article summaries.
 Option to either remove them or make them link to the article page.
+Also never show the footnotes themselves in the summary.
 """
 
 from pelican import signals
@@ -21,8 +22,11 @@ def initialized(pelican):
 
 def transform_summary(summary, article_url, site_url, mode):
     summary = BeautifulSoup(summary)
+    footnotes_div = summary.findAll('div', {'class':'footnote'})
     footnote_links = summary.findAll('a', {'rel':'footnote'})
-    if footnote_links:
+    if footnotes_div or footnote_links:
+        for div in footnotes_div:
+            div.extract()
         for link in footnote_links:
             if mode == 'remove':
                 link.extract()

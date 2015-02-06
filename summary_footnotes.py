@@ -9,7 +9,7 @@ Also never show the footnotes themselves in the summary.
 
 from pelican import signals
 from pelican.contents import Content, Article
-from BeautifulSoup import BeautifulSoup
+from bs4 import BeautifulSoup
 from six import text_type
 
 def initialized(pelican):

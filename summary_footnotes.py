@@ -7,8 +7,8 @@ Option to either remove them or make them link to the article page.
 Also never show the footnotes themselves in the summary.
 """
 
+from pelican import contents
 from pelican import signals
-from pelican.contents import Content, Article
 from bs4 import BeautifulSoup
 from six import text_type
 
@@ -19,6 +19,14 @@ def initialized(pelican):
     if pelican:
         pelican.settings.setdefault('SUMMARY_FOOTNOTES_MODE',
                                     'link')
+
+    orig_summary = contents.Content.summary
+    contents.Content.summary = \
+            property(lambda instance:
+                        get_summary(instance, orig_summary),
+                     orig_summary.fset, orig_summary.fdel,
+                     orig_summary.__doc__)
+
 
 def transform_summary(summary, article_url, site_url, mode):
     summary = BeautifulSoup(summary)
@@ -31,37 +39,28 @@ def transform_summary(summary, article_url, site_url, mode):
             if mode == 'remove':
                 link.extract()
             elif mode == 'link':
-                link['href'] = "%s/%s%s" % (site_url,
-                                            article_url,
-                                            link['href'])
+                # only rewrite once
+                if link['href'][0] == '#':
+                    link['href'] = "%s/%s%s" % (site_url,
+                                                article_url,
+                                                link['href'])
             else:
                 raise Exception("Unknown summary_footnote mode: %s" % mode)
         return text_type(summary)
     return None
 
-def summary_footnotes(instance):
-    mode = instance.settings["SUMMARY_FOOTNOTES_MODE"]
 
-    if type(instance) == Article:
-        # Monkeypatch in the rewrite on the summary because when this is run
-        # the content might not be ready yet if it depends on other files
-        # being loaded.
-        instance._orig_get_summary = instance._get_summary
-        
-        def _get_summary(self):
-            summary = self._orig_get_summary()
-            new_summary = transform_summary(summary,
-                                            self.url,
-                                            self.settings['SITEURL'],
-                                            mode)
-            if new_summary is not None:
-                return new_summary
-            else:
-                return summary
+def get_summary(self, orig_summary):
+    summary = orig_summary.fget(self)
+    new_summary = transform_summary(summary,
+                                    self.url,
+                                    self.settings['SITEURL'],
+                                    self.settings["SUMMARY_FOOTNOTES_MODE"])
+    if new_summary is not None:
+        return new_summary
+    else:
+        return summary
 
-        funcType = type(instance._get_summary)
-        instance._get_summary = funcType(_get_summary, instance, Article)
 
 def register():
     signals.initialized.connect(initialized)
-    signals.content_object_init.connect(summary_footnotes)

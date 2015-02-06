@@ -5,7 +5,8 @@ broken links because the footnotes are not included with the summary.
 This plugin lets you either remove the links or make them point to the
 full article page.
 
-This plugin was based off the [clean_summary plugin](https://github.com/getpelican/pelican-plugins/tree/master/clean_summary).
+This plugin was based off the [clean_summary][clean_summary] and
+[ssummary][ssumary] plugins.
 
 
 ##Settings##
@@ -29,3 +30,7 @@ If using the summary plugin, make sure summary appears in your plugins before
 clean summary. Eg.
 
     PLUGINS = ['summary', 'summary_footnotes', ... ]
+
+
+[clean_summary]: https://github.com/getpelican/pelican-plugins/tree/master/clean_summary
+[ssumary]: https://gist.github.com/l04m33/7e93b0bb3ca0cfc6f2d0

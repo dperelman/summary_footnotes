@@ -9,7 +9,7 @@ Also never show the footnotes themselves in the summary.
 
 from pelican import contents
 from pelican import signals
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, re
 from six import text_type
 
 def initialized(pelican):
@@ -30,8 +30,9 @@ def initialized(pelican):
 
 def transform_summary(summary, article_url, site_url, mode):
     summary = BeautifulSoup(summary, 'html.parser')
-    footnotes_div = summary.findAll('div', {'class':'footnote'})
-    footnote_links = summary.findAll('a', {'rel':'footnote'})
+    footnote_id = re.compile('fnref-\w')
+    footnotes_div = summary.findAll('div', {'id': footnote_id})
+    footnote_links = summary.findAll('a', {'class':'footnote-ref'})
     if footnotes_div or footnote_links:
         for div in footnotes_div:
             div.extract()

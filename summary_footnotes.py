@@ -7,9 +7,11 @@ Option to either remove them or make them link to the article page.
 Also never show the footnotes themselves in the summary.
 """
 
+import re
+
 from pelican import contents
 from pelican import signals
-from bs4 import BeautifulSoup, re
+from bs4 import BeautifulSoup
 from six import text_type
 
 def initialized(pelican):

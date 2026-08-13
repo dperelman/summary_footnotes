@@ -32,7 +32,7 @@ def initialized(pelican):
 
 def transform_summary(summary, article_url, site_url, mode):
     summary = BeautifulSoup(summary, 'html.parser')
-    footnote_id = re.compile('fnref-\w')
+    footnote_id = re.compile(r'fnref-\w')
     footnotes_div = summary.findAll('div', {'id': footnote_id})
     footnote_links = summary.findAll('a', {'class':'footnote-ref'})
     if footnotes_div or footnote_links:
